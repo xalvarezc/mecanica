@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="ca">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Simulador — Òrbites i potencial efectiu</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<link rel="stylesheet" href="../estil_comu.css">
+<link rel="stylesheet" href="./orbites_potencial_efectiu.css">
+</head>
+<body>
+<div class="capcalera-uab">
+  <div class="logo-bloc">
+    <img src="../imatges/logotip-versio-3-verd.png" alt="UAB">
+    <a href="../index.html" class="boto-pill link-tornar">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+        <path d="M19 12H5M11 6l-6 6 6 6"/>
+      </svg>
+      Tots els simuladors
+    </a>
+  </div>
+  <div class="tema-actual"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><ellipse cx="12" cy="12" rx="10" ry="6"/><circle cx="7" cy="12" r="2" fill="currentColor"/></svg>Forces centrals</div>
+  <div class="titol-curs">Mecànica</div>
+</div>
+
+<div class="intro">
+  <h1>Òrbites i potencial efectiu</h1>
+  <p class="sub">Per a una força central, la conservació del moment angular $l = mr^2\dot\theta$ separa el moviment en una equació radial i una d'angular. La radial és un problema unidimensional en el potencial efectiu $V_\text{ef}(r) = V(r) + l^2/2mr^2$. Tria l'energia (també arrossegant la línia horitzontal de la gràfica A) i mira com la partícula oscil·la dins el pou mentre recorre l'òrbita. Prop del mínim, l'òrbita és una circumferència pertorbada.</p>
+</div>
+
+<main class="sim">
+
+  <!-- ═══ Controls ═══ -->
+  <aside class="controls">
+
+    <div class="card">
+      <div class="card-title">Exemples</div>
+      <div class="botons">
+        <button class="preset" data-preset="circular">Circular</button>
+        <button class="preset" data-preset="pertorbada">Pertorbada</button>
+        <button class="preset" data-preset="eliptica">El·líptica</button>
+        <button class="preset" data-preset="parabolica">Parabòlica</button>
+        <button class="preset" data-preset="hiperbolica">Hiperbòlica</button>
+        <button class="preset" data-preset="harmonic">Harmònic</button>
+        <button class="preset" data-preset="roseta">Roseta</button>
+        <button class="preset" data-preset="ondulada">Ondulada</button>
+        <button class="preset" data-preset="relativista">Precessió</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Potencial</div>
+      <label class="opcio"><input type="radio" name="model" value="kepler" checked> Kepler: $V = -k/r$</label>
+      <label class="opcio"><input type="radio" name="model" value="potencia"> Llei de potència: $f = -k\,r^n$</label>
+      <label class="opcio"><input type="radio" name="model" value="pert"> Correcció: $V = -k/r - h/r^3$</label>
+
+      <div class="control" id="ctrl_n" hidden>
+        <label for="s_n">Exponent $n$ <span class="val" id="v_n"></span></label>
+        <input type="range" id="s_n" min="-2.8" max="15" step="0.05" value="-1.5">
+      </div>
+      <div class="control" id="ctrl_h" hidden>
+        <label for="s_h">Correcció $h$ <span class="val" id="v_h"></span></label>
+        <input type="range" id="s_h" min="0" max="0.06" step="0.001" value="0.02">
+        <p class="nota" id="nota_h"></p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Condicions</div>
+      <div class="control">
+        <label for="s_l">Moment angular $l$ <span class="val" id="v_l"></span></label>
+        <input type="range" id="s_l" min="0.6" max="1.6" step="0.01" value="1">
+      </div>
+      <div class="control">
+        <label for="s_E">Energia $E$ <span class="val" id="v_E"></span></label>
+        <input type="range" id="s_E" min="0" max="3" step="0.001" value="0.1">
+        <p class="nota">Lliscador: $E - V_\text{ef,min}$, en unitats de $l^2/2mr_0^2$.</p>
+      </div>
+      <p class="nota">Unitats: $m = k = 1$.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Animació</div>
+      <div class="control">
+        <label for="s_vel">Velocitat <span class="val" id="v_vel"></span></label>
+        <input type="range" id="s_vel" min="0.2" max="5" step="0.1" value="1">
+      </div>
+      <div class="botons">
+        <button id="b_marxa">Pausa</button>
+        <button id="b_reinicia">Reinicia</button>
+      </div>
+      <label class="opcio"><input type="checkbox" id="c_lineal" checked> Aproximació lineal (taronja)</label>
+      <label class="opcio"><input type="checkbox" id="c_comp" checked> Termes $V(r)$ i $l^2/2mr^2$</label>
+    </div>
+
+  </aside>
+
+  <!-- ═══ Gràfiques ═══ -->
+  <section class="grafiques">
+    <div class="card">
+      <p class="plot-title"><span class="etiqueta">A</span>Potencial efectiu $V_\text{ef}(r)$</p>
+      <canvas id="cv_pot" class="cv-ample"></canvas>
+      <p class="plot-desc"><span class="c-verd">━</span> $V_\text{ef}$ &nbsp; <span class="c-blau">━</span> energia $E$ &nbsp; <span class="c-taronja">╍</span> paràbola $V_\text{ef,min} + \tfrac12 V_\text{ef}''(r_0)(r-r_0)^2$ &nbsp; <span class="c-gris">╍</span> $V(r)$ i $l^2/2mr^2$. Segment vertical: $\tfrac12 m\dot r^2$.</p>
+    </div>
+    <div class="card">
+      <p class="plot-title"><span class="etiqueta">B</span>Òrbita al pla</p>
+      <canvas id="cv_orb" class="cv-quadrat"></canvas>
+      <p class="plot-desc">Franja verda: zona permesa $r_\text{min} \le r \le r_\text{max}$. Puntejat: òrbita circular $r_0$. <span class="c-taronja">╍</span> $1/r = u_0 + a\cos\beta\theta$.</p>
+    </div>
+    <div class="card ample">
+      <p class="plot-title"><span class="etiqueta">C</span>Moviment radial $r(t)$</p>
+      <canvas id="cv_rt" class="cv-baix"></canvas>
+      <p class="plot-desc"><span class="c-verd">━</span> exacte &nbsp; <span class="c-taronja">╍</span> oscil·lador lineal $r_0 - A\cos\omega_r t$</p>
+    </div>
+  </section>
+
+  <!-- ═══ Resultats ═══ -->
+  <aside class="resultats">
+    <div class="card">
+      <div class="card-title">Òrbita</div>
+      <p class="tipus" id="o_tipus"></p>
+      <table class="taula" id="t_orbita"></table>
+    </div>
+    <div class="card">
+      <div class="card-title">Petites oscil·lacions</div>
+      <table class="taula" id="t_lineal"></table>
+      <p class="nota">$\psi$: angle entre pericentre i apocentre. L'òrbita es tanca si $\psi/\pi$ és racional. $\Delta\varpi$: gir dels àpsides a cada oscil·lació radial (només si $\beta \approx 1$).</p>
+    </div>
+    <details class="obs">
+      <summary>Què has d'observar</summary>
+      <div class="obs-body">
+        <ol>
+          <li><b>Circular.</b> Amb $E = V_\text{ef,min}$ la partícula és quieta al fons del pou: $r = r_0$ i $\dot\theta = l/mr_0^2$.</li>
+          <li><b>Pertorbada.</b> Puja una mica $E$. A la gràfica A, $r$ oscil·la dins la paràbola amb freqüència $\omega_r$, mentre l'angle avança amb $\omega_\theta$. A Kepler $\beta = \omega_r/\omega_\theta = 1$: fa una oscil·lació radial per volta, i l'òrbita es tanca en una el·lipse.</li>
+          <li><b>Kepler és especial.</b> La corba taronja de B coincideix amb l'òrbita exacta per a qualsevol $E$, perquè l'equació en $u = 1/r$ és exactament lineal. En canvi, $r(t)$ (gràfica C) només és sinusoïdal per a $E$ petita.</li>
+          <li><b>$E \ge 0$.</b> El pou ja no té paret exterior: només hi ha un punt de retorn i la partícula escapa (paràbola i hipèrbola).</li>
+          <li><b>Llei de potència.</b> Amb $n = 1$ (harmònic), $\beta = 2$: dues oscil·lacions radials per volta, i surt una el·lipse centrada. Amb altres $n$, $\beta = \sqrt{3+n}$ és en general irracional i l'òrbita fa una roseta. Teorema de Bertrand: només $n = -2$ i $n = 1$ donen òrbites tancades per a tota $E$.</li>
+          <li><b>Ondulada.</b> Amb una força molt rígida ($n$ gran), $\beta = \sqrt{3+n} &gt; 1$: la partícula rebota entre $r_\text{min}$ i $r_\text{max}$ diverses vegades per volta, i l'òrbita és un anell ondulat. Amb $n = 6$, $\beta = 3$ i fa tres ones per volta. L'angle $\theta$ mai no retrocedeix, perquè $\dot\theta = l/mr^2$ té el signe de $l$.</li>
+          <li><b>Amplitud gran.</b> Compara $\psi$ exacte amb $\pi/\beta$. Fora de Kepler, l'angle apsidal depèn de l'amplitud.</li>
+          <li><b>Correcció $-h/r^3$.</b> $\beta &lt; 1$: el periheli avança a cada volta (com Mercuri). Si $h$ o $E$ són prou grans, la barrera centrífuga desapareix i la partícula cau al centre.</li>
+        </ol>
+      </div>
+    </details>
+  </aside>
+
+</main>
+
+<!-- ═══ Teoria ═══ -->
+<section class="teoria">
+  <h2 class="teoria-titol">Teoria</h2>
+  <p class="nota-ref">Notació de Goldstein, <i>Classical Mechanics</i> (3a ed.), capítol 3. El Goldstein escriu $V'$ per al potencial efectiu; aquí fem servir $V_\text{ef}$.</p>
+
+  <details class="bloc-teoria" open>
+    <summary>1. Moment angular i separació de les equacions</summary>
+    <div>
+      <p>Reduït a un cos de massa $m$ en un potencial central $V(r)$, el moviment és pla i el lagrangià en polars és</p>
+      $$L = \tfrac12 m\left(\dot r^2 + r^2\dot\theta^2\right) - V(r).$$
+      <p>La coordenada $\theta$ és cíclica, i el seu moment conjugat es conserva:</p>
+      $$p_\theta = m r^2 \dot\theta \equiv l = \text{const.} \qquad\Longrightarrow\qquad \frac{dA}{dt} = \frac{l}{2m}\quad\text{(segona llei de Kepler)}.$$
+      <p>L'equació angular queda integrada i dona $\dot\theta = l/mr^2$. Substituint-ho a l'equació de Lagrange per a $r$ obtenim una equació que només depèn de $r$:</p>
+      $$m\ddot r - \frac{l^2}{m r^3} = f(r) = -\frac{dV}{dr}.$$
+      <p>Primer es resol el moviment radial, i després $\theta(t) = \theta_0 + \displaystyle\int_0^t \frac{l}{m r^2(t')}\,dt'$.</p>
+    </div>
+  </details>
+
+  <details class="bloc-teoria" open>
+    <summary>2. Problema unidimensional equivalent: potencial efectiu</summary>
+    <div>
+      <p>L'energia també es conserva. Escrivint $\dot\theta$ en funció de $l$:</p>
+      $$E = \tfrac12 m\dot r^2 + \underbrace{V(r) + \frac{l^2}{2mr^2}}_{V_\text{ef}(r)}.$$
+      <p>És el moviment d'una partícula en una dimensió dins el potencial $V_\text{ef}$. El terme $l^2/2mr^2$ és la barrera centrífuga. Com que $\tfrac12 m\dot r^2 \ge 0$, el moviment només és possible on $V_\text{ef}(r) \le E$. Els <b>punts de retorn</b> (àpsides) compleixen $V_\text{ef}(r) = E$, i per quadratures:</p>
+      $$t = \int \frac{dr}{\sqrt{\frac{2}{m}\left(E - V_\text{ef}(r)\right)}}, \qquad \theta = \int \frac{l\,dr}{r^2\sqrt{2m\left(E - V_\text{ef}(r)\right)}}.$$
+    </div>
+  </details>
+
+  <details class="bloc-teoria" open>
+    <summary>3. Classificació de les òrbites (problema de Kepler)</summary>
+    <div>
+      <p>Per a $V = -k/r$, el mínim de $V_\text{ef}$ és a $r_0 = l^2/mk$ i val $V_\text{ef,min} = -mk^2/2l^2$. Segons l'energia:</p>
+      <table class="taula-teoria">
+        <tr><th>Energia</th><th>Punts de retorn</th><th>Òrbita</th><th>Excentricitat</th></tr>
+        <tr><td>$E = V_\text{ef,min}$</td><td>$r = r_0$</td><td>circular</td><td>$e = 0$</td></tr>
+        <tr><td>$V_\text{ef,min} &lt; E &lt; 0$</td><td>$r_\text{min}, r_\text{max}$</td><td>el·líptica</td><td>$0 &lt; e &lt; 1$</td></tr>
+        <tr><td>$E = 0$</td><td>només $r_\text{min}$</td><td>parabòlica</td><td>$e = 1$</td></tr>
+        <tr><td>$E &gt; 0$</td><td>només $r_\text{min}$</td><td>hiperbòlica</td><td>$e &gt; 1$</td></tr>
+      </table>
+      $$\frac{1}{r} = \frac{mk}{l^2}\left(1 + e\cos\theta\right), \qquad e = \sqrt{1 + \frac{2El^2}{mk^2}}.$$
+    </div>
+  </details>
+
+  <details class="bloc-teoria" open>
+    <summary>4. Equació de l'òrbita en $u = 1/r$</summary>
+    <div>
+      <p>Eliminant el temps amb $\dfrac{d}{dt} = \dfrac{l u^2}{m}\dfrac{d}{d\theta}$, l'equació radial esdevé</p>
+      $$\frac{d^2u}{d\theta^2} + u = -\frac{m}{l^2 u^2}\, f\!\left(\frac1u\right).$$
+      <p>Per a Kepler, $f = -ku^2$ i el membre de la dreta és la constant $mk/l^2$. L'equació és <b>exactament lineal</b> i la solució és la cònica de la secció anterior. Per això, al simulador, la corba taronja de l'òrbita coincideix amb l'exacta per a qualsevol energia.</p>
+    </div>
+  </details>
+
+  <details class="bloc-teoria" open>
+    <summary>5. Òrbita circular i petites pertorbacions</summary>
+    <div>
+      <p>L'òrbita circular de radi $r_0$ correspon al mínim de $V_\text{ef}$:</p>
+      $$V_\text{ef}'(r_0) = 0 \;\Longleftrightarrow\; f(r_0) = -\frac{l^2}{m r_0^3}, \qquad\text{i és estable si } V_\text{ef}''(r_0) &gt; 0.$$
+      <p>Pertorbem-la una mica: $r = r_0 + x$, amb $x \ll r_0$. Desenvolupant $V_\text{ef}$ fins a segon ordre, el moviment radial és un oscil·lador harmònic:</p>
+      $$m\ddot x = -V_\text{ef}''(r_0)\,x \quad\Longrightarrow\quad x = -A\cos\omega_r t, \qquad \omega_r^2 = \frac{V_\text{ef}''(r_0)}{m}, \qquad A = \sqrt{\frac{2\,(E - V_\text{ef,min})}{V_\text{ef}''(r_0)}}.$$
+      <p>Mentrestant, l'angle avança a la freqüència de l'òrbita circular, $\omega_\theta = l/mr_0^2$. El quocient de les dues freqüències només depèn de la força:</p>
+      $$\beta \equiv \frac{\omega_r}{\omega_\theta}, \qquad \beta^2 = 3 + \left.\frac{r}{f}\frac{df}{dr}\right|_{r_0}.$$
+      <p>En termes de $u$, l'òrbita pertorbada és $u = u_0 + a\cos\beta\theta$. Entre un pericentre i el següent apocentre l'angle avança l'<b>angle apsidal</b></p>
+      $$\psi = \frac{\pi}{\beta} \quad\text{(lineal)}, \qquad \psi = \int_{r_\text{min}}^{r_\text{max}} \frac{l\,dr}{r^2\sqrt{2m\left(E - V_\text{ef}(r)\right)}} \quad\text{(exacte)}.$$
+      <p>L'òrbita es tanca si $\beta$ és racional. Si no, els àpsides giren a cada oscil·lació radial un angle $\Delta\varpi = 2\psi - 2\pi$ (precessió).</p>
+      <ul>
+        <li><b>Llei de potència</b> $f = -k r^n$: $\beta^2 = 3 + n$. L'òrbita circular és estable si $n &gt; -3$.</li>
+        <li><b>Kepler</b> ($n = -2$): $\beta = 1$, una oscil·lació radial per volta; el·lipse amb el focus al centre.</li>
+        <li><b>Harmònic</b> ($n = 1$): $\beta = 2$, dues oscil·lacions per volta; el·lipse centrada.</li>
+        <li><b>Teorema de Bertrand</b>: són les dues úniques forces per a les quals <i>totes</i> les òrbites lligades són tancades.</li>
+        <li><b>Correcció</b> $-h/r^3$: $\beta^2 = \dfrac{kr_0^2 - 3h}{kr_0^2 + 3h} &lt; 1$, i el periheli avança.</li>
+      </ul>
+    </div>
+  </details>
+</section>
+
+<div class="peu-uab">Mecànica · Universitat Autònoma de Barcelona</div>
+
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<script src="./orbites_potencial_efectiu.js"></script>
+</body>
+</html>

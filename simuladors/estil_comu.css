@@ -1,0 +1,155 @@
+/* ------------------------------------------------------------------
+   estil_comu.css — full comú per a tots els simuladors de
+   Mecànica. Reprodueix l'encapçalament dels apunts (myphysicsstyle):
+   logo UAB a l'esquerra, tema al centre, títol del curs a la dreta,
+   mateix verd UAB (#009639) i regla fina sota la capçalera.
+   ------------------------------------------------------------------ */
+
+:root{
+  --uabgreen:#009639;
+  --uabgreen-dark:#00722b;
+  --bg:#FFFFFF;
+  --surface:#FFFFFF;
+  --surface-2:#E4E8ED;
+  --ink:#1A1D24;
+  --ink-2:#3C4250;
+  --muted:#6B7280;
+  --border:#D6DAE1;
+  --accent:#33469B;
+  --font-body:Seravek,'Segoe UI',system-ui,-apple-system,sans-serif;
+  --font-mono:ui-monospace,'SF Mono','Cascadia Mono',Consolas,monospace;
+}
+/* Fons de pàgina sempre blanc — no s'adapta al tema fosc del sistema */
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#FFFFFF; --surface:#FFFFFF; --surface-2:#E4E8ED;
+    --ink:#1A1D24; --ink-2:#3C4250; --muted:#6B7280; --border:#D6DAE1;
+    --accent:#33469B;
+  }
+}
+
+*{ box-sizing:border-box; min-width:0; }
+html,body{ margin:0; padding:0; max-width:100%; }
+body{
+  background:var(--bg); color:var(--ink); font-family:var(--font-body);
+}
+img, svg{ max-width:100%; }
+
+/* ---- Capçalera comuna, igual disposició que myphysicsstyle.sty ---- */
+.capcalera-uab{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:10px 24px; background:var(--surface);
+  border-bottom:1.5pt solid var(--uabgreen);
+}
+.capcalera-uab .logo-bloc{ display:flex; align-items:center; gap:14px; }
+.capcalera-uab .logo-bloc img{ height:28px; }
+.capcalera-uab .logo-bloc span{ font-weight:700; color:var(--uabgreen); font-size:1.05rem; letter-spacing:.02em; }
+.capcalera-uab .tema-actual{
+  font-size:.92rem; color:var(--ink-2); font-weight:600; text-align:center; flex:1;
+  display:flex; align-items:center; justify-content:center; gap:8px;
+}
+.capcalera-uab .tema-actual svg{ flex-shrink:0; width:20px; height:20px; color:var(--uabgreen); }
+.capcalera-uab .titol-curs{ font-size:.85rem; font-weight:700; color:var(--ink); text-align:right; white-space:nowrap; }
+
+@media (max-width:640px){
+  .capcalera-uab{ flex-direction:column; gap:6px; text-align:center; }
+  /* Al mòbil, el títol del curs (Mecànica) ha de quedar
+     primer, i el tema/capítol actual just a sota, com a subtítol. */
+  .capcalera-uab .titol-curs{ order:-1; text-align:center; font-size:1rem; white-space:normal; }
+  .capcalera-uab .tema-actual{ text-align:center; font-size:.82rem; flex:none; }
+  /* El logo + el botó de tornar no sempre caben en una sola línia als
+     mòbils estrets — que el botó baixi de línia en comptes de tallar-se. */
+  .capcalera-uab .logo-bloc{ flex-wrap:wrap; justify-content:center; row-gap:6px; }
+}
+
+.contingut{ max-width:900px; margin:0 auto; padding:28px 20px 60px; }
+
+/* ---- Botó tipus píndola (icona + text): base compartida pel link de
+   "tornar" a la capçalera i pel link del vídeo d'introducció. Mida
+   d'icona sempre fixada en px (a l'SVG mateix i aquí) perquè mai es
+   pugui inflar — un SVG sense width/height explícits pot renderitzar-se
+   pel seu valor per defecte (300×150px) si l'estil no arriba a temps. ---- */
+.boto-pill{
+  display:inline-flex; align-items:center; gap:6px;
+  font-family:var(--font-mono); font-weight:700; color:var(--uabgreen-dark);
+  text-decoration:none; white-space:nowrap;
+  background:var(--surface-2); border:1.5px solid var(--uabgreen);
+  border-radius:999px;
+}
+.boto-pill:hover{ background:var(--uabgreen); color:#FFFFFF; }
+.boto-pill svg{ flex-shrink:0; display:block; }
+
+.capcalera-uab .link-tornar{ font-size:.76rem; padding:5px 12px 5px 10px; }
+.capcalera-uab .link-tornar svg{ width:13px; height:13px; }
+
+.video-link{ font-size:.8rem; padding:8px 16px 8px 12px; margin:0 0 18px; }
+.video-link svg{ width:18px; height:18px; }
+@media (max-width:640px){
+  .video-link{ font-size:.74rem; padding:6px 12px 6px 10px; }
+  .video-link svg{ width:15px; height:15px; }
+}
+
+/* ---- Caixes/requadres comuns (gràfics, controls...): vora verda + capçalera verda ---- */
+.panel, .barra-lateral{
+  background:var(--surface);
+  border:2px solid var(--uabgreen);
+  border-radius:8px;
+  overflow:hidden;
+  padding:18px 22px;
+}
+.panel h2, .barra-lateral h2{
+  background:var(--uabgreen);
+  color:#FFFFFF !important;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+  font-weight:700;
+  font-size:.85rem;
+  margin:-18px -22px 16px -22px;
+  padding:11px 22px;
+  border-radius:8px 8px 0 0;
+}
+/* Els símbols grecs (μ, ε...) no s'han de majusculitzar — Μ majúscula es confon amb "M" llatina */
+.panel h2 .simbol, .barra-lateral h2 .simbol{ text-transform:none; }
+
+/* ---- Bloc desplegable "Què has d'observar" (guia curta, tancada per defecte) ---- */
+details.obs{
+  margin-top:14px;
+  border:1px solid var(--uabgreen);
+  border-radius:6px;
+  overflow:hidden;
+}
+details.obs summary{
+  cursor:pointer;
+  padding:10px 14px;
+  font-weight:700;
+  font-size:.82rem;
+  color:var(--uabgreen-dark);
+  background:var(--surface-2);
+  list-style:none;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  user-select:none;
+}
+details.obs summary::-webkit-details-marker{ display:none; }
+details.obs summary::before{
+  content:'▶';
+  display:inline-block;
+  font-size:.65em;
+  transition:transform .15s ease;
+  color:var(--uabgreen);
+}
+details.obs[open] summary::before{ transform:rotate(90deg); }
+details.obs .obs-body{
+  padding:12px 14px;
+  font-size:.85rem;
+  color:var(--ink-2);
+  line-height:1.55;
+  border-top:1px solid var(--border);
+}
+
+/* ---- Peu (opcional, coherent amb el peu dels apunts) ---- */
+.peu-uab{
+  padding:12px 24px; text-align:center; font-size:.78rem; color:var(--muted);
+  border-top:1px solid var(--border); margin-top:40px;
+}

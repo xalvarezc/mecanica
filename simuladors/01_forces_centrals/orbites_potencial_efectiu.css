@@ -1,0 +1,102 @@
+/* Simulador d'òrbites i potencial efectiu */
+
+:root{
+  --verd:#009639;
+  --verd-fosc:#00722b;
+  --verd-clar:#e8f5ee;
+  --blau:#33469B;
+  --taronja:#e67e22;
+  --gris:#8a929e;
+  --vora:#c8e6c9;
+  --ombra:0 1px 6px rgba(0,114,43,.10);
+}
+
+body{ background:#f4f8f5; font-size:14px; line-height:1.5; }
+
+.intro{ max-width:1500px; margin:0 auto; padding:20px 20px 0; }
+.intro h1{ font-size:1.35rem; margin:0 0 6px; }
+.intro p.sub{ color:var(--muted); font-size:.9rem; max-width:980px; margin:0 0 12px; }
+
+/* ── Disposició: controls | gràfiques | resultats ── */
+.sim{
+  display:grid;
+  grid-template-columns:260px minmax(0,1fr) 280px;
+  gap:12px; padding:12px; max-width:1500px; margin:0 auto; align-items:start;
+}
+.grafiques{ display:grid; grid-template-columns:minmax(0,1.35fr) minmax(0,1fr); gap:12px; }
+.grafiques .ample{ grid-column:1 / -1; }
+.controls, .resultats{ display:flex; flex-direction:column; gap:12px; }
+
+@media (max-width:1250px){
+  .sim{ grid-template-columns:240px minmax(0,1fr); }
+  .resultats{ grid-column:1 / -1; display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); }
+}
+@media (max-width:820px){
+  .sim{ grid-template-columns:minmax(0,1fr); }
+  .grafiques{ grid-template-columns:minmax(0,1fr); }
+}
+
+.card{
+  background:#fff; border:1px solid var(--vora); border-radius:8px;
+  padding:10px 12px; box-shadow:var(--ombra);
+}
+.card-title{
+  font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:1px;
+  color:var(--verd-fosc); border-bottom:2px solid var(--verd);
+  padding-bottom:4px; margin-bottom:8px;
+}
+.plot-title{ font-size:.85rem; font-weight:700; color:var(--verd-fosc); margin:0 0 6px; }
+.etiqueta{
+  display:inline-block; width:20px; height:20px; line-height:20px; text-align:center;
+  border-radius:50%; background:var(--verd); color:#fff; font-size:.72rem; margin-right:6px;
+}
+.plot-desc{ font-size:.74rem; color:var(--muted); margin:6px 0 0; text-align:center; }
+.c-verd{ color:var(--verd); font-weight:700; }
+.c-blau{ color:var(--blau); font-weight:700; }
+.c-taronja{ color:var(--taronja); font-weight:700; }
+.c-gris{ color:var(--gris); font-weight:700; }
+
+canvas{ display:block; width:100%; touch-action:none; }
+.cv-ample{ aspect-ratio:4 / 3; cursor:ns-resize; }
+.cv-quadrat{ aspect-ratio:1 / 1; }
+.cv-baix{ aspect-ratio:4 / 1; min-height:150px; }
+
+/* ── Controls ── */
+.botons{ display:flex; flex-wrap:wrap; gap:5px; }
+.botons button{
+  font-size:.76rem; font-weight:600; color:var(--verd-fosc); background:#fff;
+  border:1px solid var(--verd); border-radius:5px; padding:4px 9px; cursor:pointer;
+}
+.botons button:hover{ background:var(--verd-clar); }
+.botons button.actiu{ background:var(--verd); color:#fff; }
+
+.opcio{ display:flex; align-items:center; gap:6px; font-size:.82rem; margin:5px 0; cursor:pointer; }
+.control{ margin:8px 0 4px; }
+.control label{ display:flex; justify-content:space-between; font-size:.82rem; font-weight:600; }
+.control .val{ font-family:var(--font-mono); color:var(--blau); }
+.control input[type=range]{ width:100%; accent-color:var(--verd); }
+.nota{ font-size:.72rem; color:var(--muted); margin:3px 0 0; }
+.nota.avis{ color:#b03a2e; }
+
+/* ── Resultats ── */
+.tipus{ font-weight:700; font-size:.95rem; color:var(--verd-fosc); margin:0 0 6px; }
+.taula{ width:100%; border-collapse:collapse; font-size:.8rem; }
+.taula td{ padding:3px 2px; border-bottom:1px solid #eef2ef; }
+.taula td:last-child{ text-align:right; font-family:var(--font-mono); white-space:nowrap; }
+.resultats details.obs{ margin-top:0; background:#fff; }
+.obs-body ol{ margin:0; padding-left:18px; }
+.obs-body li{ margin-bottom:6px; }
+
+/* ── Teoria ── */
+.teoria{ max-width:980px; margin:20px auto 0; padding:0 20px; }
+.teoria-titol{ font-size:1.15rem; color:var(--verd-fosc); border-bottom:2px solid var(--verd); padding-bottom:4px; }
+.nota-ref{ font-size:.82rem; color:var(--muted); }
+.bloc-teoria{ background:#fff; border:1px solid var(--vora); border-radius:8px; margin:10px 0; box-shadow:var(--ombra); }
+.bloc-teoria summary{
+  cursor:pointer; padding:10px 14px; font-weight:700; color:var(--verd-fosc); user-select:none;
+}
+.bloc-teoria > div{ padding:0 18px 12px; border-top:1px solid #eef2ef; }
+.bloc-teoria .katex-display{ overflow-x:auto; overflow-y:hidden; padding:2px 0; }
+.taula-teoria{ border-collapse:collapse; margin:8px auto; font-size:.88rem; }
+.taula-teoria th, .taula-teoria td{ border:1px solid var(--vora); padding:5px 10px; text-align:center; }
+.taula-teoria th{ background:var(--verd-clar); color:var(--verd-fosc); }

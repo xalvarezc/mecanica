@@ -3,15 +3,45 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Mecànica — Simuladors</title>
+<title>Simuladors — Mecànica</title>
+<link rel="stylesheet" href="estil_comu.css">
 <style>
-  body { font-family: system-ui, sans-serif; max-width: 48rem; margin: 3rem auto; padding: 0 1rem; color: #222; background: #fff; line-height: 1.5; }
-  h1 { color: #00722b; }
-  a { color: #00722b; }
+  h1{ font-size:1.4rem; margin:0 0 4px; }
+  p.sub{ color:var(--muted); font-size:.9rem; margin:0 0 28px; }
+  .tema{ border:1px solid var(--border); border-radius:8px; background:var(--surface); margin-bottom:14px; overflow:hidden; }
+  .tema h2{ margin:0; padding:12px 18px; font-size:1rem; color:var(--ink); background:var(--surface-2); }
+  .llista-sim{ list-style:none; margin:0; padding:6px 18px 12px; }
+  .llista-sim li{ padding:8px 0; border-bottom:1px solid var(--border); font-size:.92rem; }
+  .llista-sim li:last-child{ border-bottom:none; }
+  .llista-sim a{ color:var(--uabgreen-dark); text-decoration:none; font-weight:600; }
+  .llista-sim a:hover{ text-decoration:underline; }
+  .llista-sim .desc{ color:var(--muted); font-size:.82rem; display:block; margin-top:2px; }
 </style>
 </head>
 <body>
-<h1>Mecànica</h1>
-<p>Simuladors de l'assignatura. En construcció.</p>
+<div class="capcalera-uab">
+  <div class="logo-bloc">
+    <img src="imatges/logotip-versio-3-verd.png" alt="UAB">
+  </div>
+  <div class="tema-actual">Banc de simuladors</div>
+  <div class="titol-curs">Mecànica</div>
+</div>
+
+<div class="contingut">
+  <h1>Simuladors per tema</h1>
+  <p class="sub">Simuladors interactius de l'assignatura.</p>
+
+  <div class="tema">
+    <h2>Forces centrals</h2>
+    <ul class="llista-sim">
+      <li>
+        <a href="01_forces_centrals/orbites_potencial_efectiu.html">Òrbites i potencial efectiu</a>
+        <span class="desc">Separació radial i angular amb el moment angular, potencial efectiu, òrbites circulars, el·líptiques, parabòliques i hiperbòliques, petites oscil·lacions i precessió.</span>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="peu-uab">Mecànica · Universitat Autònoma de Barcelona</div>
 </body>
 </html>
